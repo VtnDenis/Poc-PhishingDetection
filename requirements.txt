@@ -1,9 +1,11 @@
 ipykernel
 pandas
 numpy
+matplotlib
 scikit-learn
 imblearn
 xgboost
 catboost
+shap
 mlflow
 fastapi[standard]
