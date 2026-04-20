@@ -63,3 +63,9 @@ Training code is in `main.ipynb`. To update the served models:
 
 No license specified.
 
+## TODO List
+
+- AutoML with MLFlow
+- GUI for AutoML
+- Deploy on web (Vercel?)
+- CI/CD (Render?)
