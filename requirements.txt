@@ -2,4 +2,8 @@ ipykernel
 pandas
 numpy
 scikit-learn
+imblearn
 xgboost
+catboost
+mlflow
+fastapi[standard]
