@@ -1,11 +1,20 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 class EmailIn(BaseModel):
     email: str
 
 app = FastAPI(title="PhishingDetector")
+
+# Serve static frontend
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", include_in_schema=False)
+def root():
+    return FileResponse("static/index.html")
 
 # Chemin des modèles
 MODEL_PATH = "models/xgb_model.joblib"
