@@ -5,15 +5,63 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Phishing Detector</title>
   <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .model-field select {
+      flex: 1;
+      padding: 11px 8px;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa4b2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+    .model-field select:focus { outline: none; }
+    .model-field select option { background: var(--card); color: #e6eef6; }
+  </style>
 </head>
 <body>
   <main class="container">
     <section class="card" role="region" aria-labelledby="title">
       <h1 id="title">Phishing Detector</h1>
-      <p class="lead">Paste an email or message below and click Predict.</p>
+      <p class="lead">Fill in the email details below and click Predict.</p>
 
-      <label for="emailInput" class="sr-only">Email text</label>
-      <textarea id="emailInput" placeholder="Paste email text here..." maxlength="10000" rows="10" aria-describedby="charCount"></textarea>
+      <div class="meta-fields model-field">
+        <div class="field field--model">
+          <label for="modelSelect">
+            <span class="field__icon">⚙</span>
+            <span class="field__label">Modèle utilisé</span>
+          </label>
+          <select id="modelSelect">
+            <option value="">Modèle par défaut</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="meta-fields">
+        <div class="field field--sender">
+          <label for="senderInput">
+            <span class="field__icon">↩</span>
+            <span class="field__label">From</span>
+          </label>
+          <input id="senderInput" type="email" placeholder="sender@example.com" maxlength="500" autocomplete="email">
+        </div>
+      </div>
+
+      <div id="fieldsWarning" class="fields-warning hidden" role="alert">
+        <span class="warning__icon">⚠</span>
+        <span id="warningText">Fill in <strong>Sender</strong> for accurate prediction.</span>
+      </div>
+
+      <label for="emailInput" class="sr-only">Email body</label>
+      <textarea id="emailInput" placeholder="Paste email body here..." maxlength="10000" rows="8" aria-describedby="charCount"></textarea>
 
       <div class="controls">
         <div id="charCount" class="char-count">0 / 10000</div>
@@ -27,17 +75,54 @@
         <div class="examples-label">Examples:</div>
         <div class="examples-list">
           <div class="examples-group">
-            <div class="group-title">Phishing examples</div>
-            <button type="button" class="example-btn phish" data-sample="Urgent: Your account will be suspended. Click here to verify your information: http://verify.example/login">Account suspension</button>
-            <button type="button" class="example-btn phish" data-sample="You have received a refund of $199. Verify your details and claim here: http://claim.example">Refund offer</button>
-            <button type="button" class="example-btn phish" data-sample="Congratulations! You won an iPhone. Confirm your details here: http://win.example">Winner notification</button>
+            <div class="group-title">Spam examples</div>
+            <button type="button" class="example-btn phish"
+              data-sample="Save up to 70% on Life Insurance. Why Spend More Than You Have To? Ensuring your family's financial security is very important. Life Quote Savings makes buying life insurance simple and affordable. We Provide FREE Access to The Very Best Companies and The Lowest Rates. Life Quote Savings is FAST, EASY and SECURE. Take a moment and compare our rates. You will see we have the lowest prices anywhere."
+              data-sender="12a1mailbot1@web.de">Life insurance ad</button>
+            <button type="button" class="example-btn phish"
+              data-sample="1) Fight The Risk of Cancer!
+http://www.adclick.ws/p.cfm?o=315&s=pk007
+
+2) Slim Down - Guaranteed to lose 10-12 lbs in 30 days
+http://www.adclick.ws/p.cfm?o=249&s=pk007
+
+3) Get the Child Support You Deserve - Free Legal Advice
+http://www.adclick.ws/p.cfm?o=245&s=pk002
+
+4) Join the Web's Fastest Growing Singles Community
+http://www.adclick.ws/p.cfm?o=259&s=pk007
+
+5) Start Your Private Photo Album Online
+http://www.adclick.ws/p.cfm?o=260&s=pk007"
+              data-sender="Slim Down">Weight loss spam</button>
+            <button type="button" class="example-btn phish"
+              data-sample="A POWERHOUSE GIFTING PROGRAM You Don't Want To Miss! 
+
+GET IN WITH THE FOUNDERS! 
+The MAJOR PLAYERS are on This ONE
+For ONCE be where the PlayerS are
+This is YOUR Private Invitation
+
+EXPERTS ARE CALLING THIS THE FASTEST WAY TO HUGE CASH FLOW EVER CONCEIVED
+Leverage $1,000 into $50,000 Over and Over Again
+
+THE QUESTION HERE IS:
+YOU EITHER WANT TO BE WEALTHY OR YOU DON'T!!!"
+              data-sender="TheCashSystem">Cash gifting scheme</button>
           </div>
           <div class="examples-group">
-            <div class="group-title">Legitimate examples</div>
-            <button type="button" class="example-btn legit" data-sample="Meeting for december 11, please mark your calendars for the december 11
-The meeting is scheduled from 8 : 00 am to 5 : 00 pm.">Meeting</button>
-            <button type="button" class="example-btn legit" data-sample="Merchanting metals update: several related issues have resulted in an increase in the level of operating risk for the merchanting metals business.">Update alert</button>
-            <button type="button" class="example-btn legit" data-sample="I know that you are dealing with more important things now but I wanted to keep you up to speed on tbg and vng as i continue to move them forward.">Follow-up e-mail</button>
+            <div class="group-title">Ham examples</div>
+            <button type="button" class="example-btn legit"
+              data-sample="In a nutshell - Solaris is Suns own flavour of UNIX.
+
+Can someone explain what type of operating system Solaris is... as ive never seen or used it i dont know wheather to get a server running Solaris or Linux. I've heard Solaris is very stable but I'm not sure about licensing costs and hardware requirements."
+              data-sender="Fergal Moran &lt;fergal.moran@wasptech.com&gt;">Solaris explanation</button>
+            <button type="button" class="example-btn legit"
+              data-sample="I just had to jump in here as Carbonara is one of my favourites to make and ask what the hell are you supposed to use instead of cream? I've never seen a recipe that hasn't used this. Personally I use low fat creme fraiche because it works quite nicely but the only time I've seen a recipe that doesn't use cream is from an Italian chef who said egg yolk and parmesan."
+              data-sender="Stewart Smith &lt;Stewart.Smith@ee.ed.ac.uk&gt;">Cooking discussion</button>
+            <button type="button" class="example-btn legit"
+              data-sample="Isn't it just basically a mixture of beaten egg and bacon (or pancetta, really)? You mix in the raw egg to the cooked pasta and the heat of the pasta cooks the egg. That's my understanding. The trick is to take the pan off the heat before adding the egg mixture so it doesn't scramble. Toss vigorously and it emulsifies into a creamy sauce without any cream at all."
+              data-sender="Martin Adamson &lt;martin@srv0.ems.ed.ac.uk&gt;">Recipe reply</button>
           </div>
         </div>
       </div>
@@ -55,6 +140,7 @@ The meeting is scheduled from 8 : 00 am to 5 : 00 pm.">Meeting</button>
     </section>
     <footer class="footer">Model: XGBoost + TF‑IDF — demo • Front‑end generated by AI</footer>
   </main>
+  <script src="/static/navbar.js" defer></script>
   <script src="/static/app.js" defer></script>
 </body>
 </html>
